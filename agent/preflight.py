@@ -37,7 +37,7 @@ def main() -> None:
 
     # 2. Model name not deprecated
     print("\n-- Model --")
-    model = os.environ.get("GEMINI_MODEL") or "gemini-2.0-flash"
+    model = os.environ.get("GEMINI_MODEL") or "gemini-2.5-flash"
     check("MODEL_NOT_DEPRECATED", model not in DEPRECATED_MODELS, f"using: {model}")
 
     # 3. Key imports
@@ -75,7 +75,8 @@ def main() -> None:
 
     # 7. Ignore file exists
     print("\n-- Ignore files --")
-    check("GITIGNORE_EXISTS", os.path.isfile(".gitignore"), "missing")
+    exists = os.path.isfile(".gitignore")
+    check("GITIGNORE_EXISTS", exists, "" if exists else "missing")
 
     # 8. No deprecated model strings in source/CI
     print("\n-- Deprecated identifiers --")
