@@ -7,7 +7,7 @@ import subprocess
 import sys
 
 REQUIRED_ENV = ["GEMINI_API_KEY", "GITHUB_TOKEN", "PR_NUMBER", "REPO"]
-DEPRECATED_MODELS = {"gemini-pro", "gemini-1.0-pro", "gemini-1.5-pro-001", "gemini-ultra"}
+DEPRECATED_MODELS = {"gemini-pro", "gemini-1.0-pro", "gemini-1.5-pro-001", "gemini-ultra", "gemini-2.0-flash"}
 # Matches module-level (column 0) client instantiation — lazy init means these must NOT appear
 _TOPLEVEL_CLIENT_RE = re.compile(
     r'^[a-zA-Z_]\w*\s*=\s*(genai\.Client|Github|requests\.Session)\s*\(', re.MULTILINE
@@ -37,7 +37,7 @@ def main() -> None:
 
     # 2. Model name not deprecated
     print("\n-- Model --")
-    model = os.environ.get("GEMINI_MODEL") or "gemini-2.0-flash"
+    model = os.environ.get("GEMINI_MODEL") or "gemini-2.5-flash"
     check("MODEL_NOT_DEPRECATED", model not in DEPRECATED_MODELS, f"using: {model}")
 
     # 3. Key imports
@@ -75,13 +75,16 @@ def main() -> None:
 
     # 7. Ignore file exists
     print("\n-- Ignore files --")
-    check("GITIGNORE_EXISTS", os.path.isfile(".gitignore"), "missing")
+    exists = os.path.isfile(".gitignore")
+    check("GITIGNORE_EXISTS", exists, "" if exists else "missing")
 
     # 8. No deprecated model strings in source/CI
     print("\n-- Deprecated identifiers --")
     deprecated_found = []
     for pattern in ["**/*.py", ".github/**/*.yml"]:
         for fpath in glob.glob(pattern, recursive=True):
+            if os.path.abspath(fpath) == os.path.abspath(__file__):
+                continue  # skip self — DEPRECATED_MODELS definition would self-trigger
             try:
                 with open(fpath) as f:
                     content = f.read()

@@ -38,7 +38,7 @@ In your repo: **Settings → Secrets and variables → Actions → Secrets**
 
 | Variable | Default | Notes |
 |----------|---------|-------|
-| `GEMINI_MODEL` | `gemini-2.0-flash` | Verify name at [ai.google.dev/gemini-api/docs/models](https://ai.google.dev/gemini-api/docs/models) before changing |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | Verify name at [ai.google.dev/gemini-api/docs/models](https://ai.google.dev/gemini-api/docs/models) before changing |
 
 ### 3. Install workflow
 
