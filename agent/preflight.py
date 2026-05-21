@@ -82,6 +82,8 @@ def main() -> None:
     deprecated_found = []
     for pattern in ["**/*.py", ".github/**/*.yml"]:
         for fpath in glob.glob(pattern, recursive=True):
+            if os.path.abspath(fpath) == os.path.abspath(__file__):
+                continue  # skip self — DEPRECATED_MODELS definition would self-trigger
             try:
                 with open(fpath) as f:
                     content = f.read()
