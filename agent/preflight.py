@@ -7,7 +7,7 @@ import subprocess
 import sys
 
 REQUIRED_ENV = ["GEMINI_API_KEY", "GITHUB_TOKEN", "PR_NUMBER", "REPO"]
-DEPRECATED_MODELS = {"gemini-pro", "gemini-1.0-pro", "gemini-1.5-pro-001", "gemini-ultra"}
+DEPRECATED_MODELS = {"gemini-pro", "gemini-1.0-pro", "gemini-1.5-pro-001", "gemini-ultra", "gemini-2.0-flash"}
 # Matches module-level (column 0) client instantiation — lazy init means these must NOT appear
 _TOPLEVEL_CLIENT_RE = re.compile(
     r'^[a-zA-Z_]\w*\s*=\s*(genai\.Client|Github|requests\.Session)\s*\(', re.MULTILINE

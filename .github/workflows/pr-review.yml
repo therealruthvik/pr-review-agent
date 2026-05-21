@@ -38,7 +38,7 @@ jobs:
           REPO: ${{ github.repository }}
           # Override in repo vars (Settings → Variables) to change model.
           # Verify model is still listed at https://ai.google.dev/gemini-api/docs/models
-          # before changing. Default: gemini-2.0-flash
+          # before changing. Default: gemini-2.5-flash
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
 
       - name: Run review agent

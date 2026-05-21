@@ -145,7 +145,7 @@ Please review this PR now. Add inline comments for specific issues, then call fi
         types.Content(role="user", parts=[types.Part(text=user_message)])
     ]
 
-    model = os.environ.get("GEMINI_MODEL") or "gemini-2.0-flash"
+    model = os.environ.get("GEMINI_MODEL") or "gemini-2.5-flash"
     config = types.GenerateContentConfig(
         system_instruction=_SYSTEM_PROMPT,
         tools=[TOOL],
