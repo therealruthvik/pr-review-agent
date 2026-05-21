@@ -3,6 +3,7 @@ import json
 from dataclasses import dataclass, field
 from typing import Optional
 
+import requests
 from google.genai import types
 
 from . import github_client as gh
@@ -124,6 +125,19 @@ TOOL = types.Tool(
 )
 
 # ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _inline_comments_as_markdown(comments: list[dict]) -> str:
+    if not comments:
+        return ""
+    lines = ["\n\n---\n### Inline comments (could not attach to diff lines)\n"]
+    for c in comments:
+        lines.append(f"**`{c['path']}:{c['line']}`**\n{c['body']}\n")
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
 # Dispatch
 # ---------------------------------------------------------------------------
 
@@ -154,13 +168,28 @@ def dispatch(name: str, args: dict) -> str:
         if name == "finalize_review":
             s.summary = args["summary"]
             s.verdict = args["verdict"]
-            gh.post_review(
-                pr_number=s.pr_number,
-                commit_sha=s.head_sha,
-                body=args["summary"],
-                event=args["verdict"],
-                comments=s.inline_comments,
-            )
+            try:
+                gh.post_review(
+                    pr_number=s.pr_number,
+                    commit_sha=s.head_sha,
+                    body=args["summary"],
+                    event=args["verdict"],
+                    comments=s.inline_comments,
+                )
+            except requests.HTTPError as exc:
+                if exc.response is not None and exc.response.status_code == 422 and s.inline_comments:
+                    # Line numbers not in diff hunk — GitHub rejects inline comments.
+                    # Fold them into the summary and post without comments.
+                    fallback_body = args["summary"] + _inline_comments_as_markdown(s.inline_comments)
+                    gh.post_review(
+                        pr_number=s.pr_number,
+                        commit_sha=s.head_sha,
+                        body=fallback_body,
+                        event=args["verdict"],
+                        comments=[],
+                    )
+                else:
+                    raise
             s.finalized = True
             return "Review posted successfully."
 
